@@ -1,0 +1,26 @@
+\documentclass{article}
+\usepackage[french]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Compilation d’expressions arithmétiques}
+\author{Evelyne Le Bezvoët}
+
+\begin{document}
+\maketitle
+
+
+\section{Problèmes rencontrés lors du projet}
+
+Au début du projet, j'ai essayé de coder un lexeur à la main, mais j'ai vu que je mettais beaucoup trop de temps à corriger des bugs. J'ai donc pris la décision d'utiliser ocamllex et ocamlyacc. J'ai encore eu beaucoup de problèmes de compilation: pour l'expression 1+2, mon lexer reconnaissait Int(+1) INT(+2) et mon parser affichait une erreur. J'ai dû changer la définition des entiers dans le lexeur.
+
+Le lexeur et le parseur ne reconnaissent pas l'expression -.1 , puisqu'il y a ambiguïté entre "PLUSF INT(1)" qui est faux et "PLUS FLOAT(0.1)". Je n'ai pas encore réussi à résoudre ce problème.
+
+Je n'ai pas encore fait les conversions int() et float().
+
+Sinon aritha marche bien sur les entiers.
+J'ai tenté l'addition sur les flottants, mais mon algorithme beugue encore.
+
+\end{document}
