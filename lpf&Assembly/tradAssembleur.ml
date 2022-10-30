@@ -3,7 +3,7 @@ open Ast
 open Calc
 
 
-
+(*permet de coller une liste d'éléments de asm et donne un élément de asm*)
 let rec cc = function
   | [] -> nop
   | [a] -> a
@@ -46,7 +46,7 @@ let writeAs = function
   | I exp -> writeAsInt exp
   | F exp -> nop (*writeAsFloat exp*)
 
-
+(*on crée le programme*)
 let makeprog exp =
   {text = (cc [inline "\t.globl main\nmain:\n";writeAs exp;
                inline "\tpopq %rdi\n\tcall print_int\n\tret\n
@@ -61,4 +61,4 @@ print_int:
 
 
 let masterprog = makeprog result;;
-print_in_file (nomExecutable^".s") masterprog;;
+print_in_file (nomExecutable^".s") masterprog;;  (*on écrit masterprog dans le fichier <nomExecutable>.s*)
