@@ -6,7 +6,7 @@ OCAMLFLAGS=$(INCLUDES) -g
 OCAMLOPTFLAGS=$(INCLUDES)
 
 # The list of object files for prog1
-MAIN_OBJS=ast.cmo parser.cmo lexer.cmo calc.cmo x86_64.cmo tradAssembleur.cmo
+MAIN_OBJS=ast.cmo parser.cmo lexer.cmo calc.cmo x86_64.cmo tradAssembleur.cmo rapport.pdf
 
 aritha: .depend $(MAIN_OBJS)
         $(OCAMLC) -o aritha $(OCAMLFLAGS) $(MAIN_OBJS)
@@ -18,6 +18,10 @@ x86_64.cmo: x86_64.ml
         ocamlc -c x86_64.ml
 x86_64.ml: x86_64.cmi x86_64.mli
         ocamlc -c x86_64.mli
+        
+rapport.pdf: rapport.tex
+	pdflatex rapport.tex
+        
 .mll.ml:
         ocamllex $<
 .mly.ml:
