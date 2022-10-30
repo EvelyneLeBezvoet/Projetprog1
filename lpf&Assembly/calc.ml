@@ -1,6 +1,7 @@
 (* File calc.ml *)
 open Ast;;
 
+(*les fonctions suivantes servent à afficher l'arbre syntaxique obtenu grâce aux lexeur et parseur, pour vérifier les formule *)
 let print_op = function
         | Add -> print_string "Add"
         | Sub -> print_string "Sub"
@@ -35,12 +36,13 @@ let print_exp expr = match expr with
         | I e -> print_exprint e
         | F e -> print_exprfloat e;;
 
-let nomfichier = Sys.argv.(1)
+let nomfichier = Sys.argv.(1)                                                  (*nom du fichier sur lequel on applique .\aritha *)
 let nomExecutable = String.sub nomfichier 0 ((String.length nomfichier) - 4)   (*nom de l'executable*)
-let result =
+let result =                                                                   (*cette variable contient l'arbre syntaxique, qu'on utilise dans tradAssembleur.ml*)
 let text = Arg.read_arg Sys.argv.(1) in
   let lexbuf = Lexing.from_string (text.(0)) in
   Parser.prog Lexer.read lexbuf;;
 
+(* ces commandes permettent d'afficher l'arbre syntaxique *)
 (* in
   (print_exp result; print_newline(); flush stdout) *)
