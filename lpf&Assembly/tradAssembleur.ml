@@ -1,9 +1,7 @@
-open X86_64
 open Ast
+open X86_64
 open Calc
 
-
-(*permet de coller une liste d'éléments de asm et donne un élément de asm*)
 let rec cc = function
   | [] -> nop
   | [a] -> a
@@ -32,8 +30,36 @@ let rec writeAsInt = function
   | Unop (Plus, exp1) -> writeAsInt exp1
   | Unop (Minus, exp1) -> cc [writeAsInt exp1; popq rdi; movq (imm (-1)) (reg rax);
                               imulq (reg rdi) (reg rax); pushq (reg rax)]
+let x = ref 0;;
+let prog = ref {text = nop; data = nop};;
+
+let writeAsFloatInter exp =
+let rec aux = function
+  | Float a -> (prog := {text = cc [(!prog).text;inline ("\tmovsd  .LC"^(string_of_int !x)^"(%rip), %xmm0
+                    \n\tmovsd %xmm0, -8(%rsp)\n\tsubq $8, %rsp\n")];
+                         data = cc [(!prog).data;inline (".LC"^(string_of_int !x)^":\n\t.double "^(string_of_float a)^"\n")]};
+                incr x)
+  | Binopf(Addf, e1, e2) -> (aux e1; aux e2;
+                             (prog := {text = (cc [(!prog).text;
+                                                   inline ("\tmovsd   (%rsp), %xmm0\n\tmovsd   8(%rsp), %xmm1\n\t
+                               addq    $16, %rsp\n\taddsd %xmm0, %xmm1\n\tmovsd %xmm1, -8(%rsp)\n\tsubq $8, %rsp")]);
+                                       data = (!prog).data}));
+                                       in aux exp;
+(!prog);;
+
+let rec writeAsFloat prog = prog.text;;
 
 
+
+
+(*let blup = Binopf(Addf, Float 6.5, Float 3.);;
+let rep = writeAsFloatInter blup;;
+  *)
+
+
+
+
+(*let result = F (Binopf(Addf,Float 6.34,Float 3.2))*)
   (* tests :
 let x = writeAsInt result;;
 let y = writeAsInt (Binop(Div,Int 6,Int 3));;
@@ -44,21 +70,27 @@ let w = writeAsInt (Binop(Sub,Int 4, Int 2));; *)
 (*On sépare l'écriture des expressions entières et flottantes*)
 let writeAs = function
   | I exp -> writeAsInt exp
-  | F exp -> nop (*writeAsFloat exp*)
+  | F exp -> writeAsFloat (writeAsFloatInter exp)
+ 
+ let makeprog = function
+  | I exp ->
+      {text = (cc [inline "\t.globl main\nmain:\n";writeAs (I exp);
+                   inline "\tpopq %rdi\n\tcall print_int\n\tret\n
 
-(*on crée le programme*)
-let makeprog exp =
-  {text = (cc [inline "\t.globl main\nmain:\n";writeAs exp;
-               inline "\tpopq %rdi\n\tcall print_int\n\tret\n
-
-print_int:
-        movq %rdi, %rsi
-        movq $message, %rdi
-        call printf
-        ret\n\n"]);
-   data = (inline "message:\n\t.string \"%d \"");
-  }
+                                                                                print_int:
+                         movq %rdi, %rsi
+                         movq $message, %rdi
+                         call printf
+                         ret\n\n"]);
+       data = (inline "message:\n\t.string \"%d \"");
+      }
+  | F exp ->
+      {text = (cc [inline "\t.globl main\nmain:\n";writeAs (F exp);
+                   inline "\n\tmovsd   (%rsp), %xmm0\n\taddq    $8, %rsp\n\tmovq    %xmm0, %rdi
+                          \n\tcall print_float\n\tret
+       \nprint_float:\n\tmovq    %rsp, %rbp\n\tmovq    %rdi, %xmm0\n\t movl    $convfloat, %edi\n\tmovl    $1, %eax\n\tcall    printf\n\tret\n"]);
+       data = (cc [inline "message:\n\tconvfloat:\n\t.string \"%g\"\n"; (writeAsFloatInter exp).data])}
 
 
 let masterprog = makeprog result;;
-print_in_file (nomExecutable^".s") masterprog;;  (*on écrit masterprog dans le fichier <nomExecutable>.s*)
+print_in_file (nomExecutable^".s") masterprog;;
