@@ -52,8 +52,8 @@ clean:
         rm -f parser.ml parser.mli
         rm -f lexer.ml
         rm -f test.tmp
-        rm -f hello.s
-        rm -f h
+        rm -f *.s
+
 # Dependencies - have to do the
 # parser.* dependencies by hand
 # since they're not seen by
