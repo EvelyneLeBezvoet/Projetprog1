@@ -1,3 +1,7 @@
+(* On sépare les opérateurs spécifiques aux entiers et aux flottants
+pour que le parser détecte les erreurs de typage dans les formules*)
+
+
 type bopint =
         | Add
         | Sub
@@ -5,6 +9,7 @@ type bopint =
         | Div
         | Mod
 
+(* pour représenter +5 ou -(3+4) par exemple *)
 type uopint =
         | Plus
         | Minus
@@ -30,6 +35,7 @@ type exprfloat =
         | Binopf of bopfloat * exprfloat * exprfloat
         | Unopf of uopfloat * exprfloat
 
+(*on réunit les deux types d'écritures sous un même type exp*)
 type exp =
         | I of exprint
         | F of exprfloat
